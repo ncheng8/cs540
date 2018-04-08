@@ -52,13 +52,12 @@ public class Chatbot {
 			// instantiate all the segments, put a word in each one
 			// this way, the list is ordered based on word
 			for (int i = 0; i <= 4700; i++) {
-				int[] t = { i };
-				allIntervals.add(new Segment(1, t));
+				allIntervals.add(new Segment(i));
 			}
 			// go through corpus and update the word counts as we go
 			for (Integer t : corpus)
 				allIntervals.get(t).addCount();
-			// calculate the l and r values for each segment based on their counts 
+			// calculate the l and r values for each segment based on their counts
 			// and the size of the corpus
 			for (Segment s : allIntervals) {
 				s.setLHS(currPos);
@@ -68,15 +67,15 @@ public class Chatbot {
 			// search through the segment list and find the "randomly chosen" word
 			for (Segment s : allIntervals) {
 				if (r <= s.getRHS() && r > s.getLHS()) {
-					System.out.println(s.wordIndex()[0]);
+					System.out.println(s.getWord());
 					System.out.println(String.format("%.7f", s.getLHS()));
 					System.out.println(String.format("%.7f", s.getRHS()));
 				}
 			}
-			//try binary search
+			// try binary search
 			int index = binarySearch(allIntervals, r);
 			Segment s = allIntervals.get(index);
-			System.out.println(s.wordIndex()[0]);
+			System.out.println(s.getWord());
 			System.out.println(String.format("%.7f", s.getLHS()));
 			System.out.println(String.format("%.7f", s.getRHS()));
 		} else if (flag == 300) {
@@ -85,7 +84,14 @@ public class Chatbot {
 			int count = 0;
 			ArrayList<Integer> words_after_h = new ArrayList<Integer>();
 			// TODO
-
+			for (int i = 0; i < corpus.size(); i++) {
+				if (corpus.get(i) == h) {
+					if (corpus.get(i + 1) == w) {
+						count++;
+					}
+					words_after_h.add(corpus.get(i + 1));
+				}
+			}
 			// output
 			System.out.println(count);
 			System.out.println(words_after_h.size());
@@ -95,6 +101,13 @@ public class Chatbot {
 			int n2 = Integer.valueOf(args[2]);
 			int h = Integer.valueOf(args[3]);
 			// TODO
+			// list of all segments; 4700, one for each word
+			ArrayList<Segment> allIntervals = new ArrayList<Segment>();
+			// instantiate all the segments, put a word in each one
+			// this way, the list is ordered based on word
+			for (int i = 0; i <= 4700; i++) {
+				allIntervals.add(new Segment(i));
+			}
 
 		} else if (flag == 500) {
 			int h1 = Integer.valueOf(args[1]);
@@ -103,7 +116,14 @@ public class Chatbot {
 			int count = 0;
 			ArrayList<Integer> words_after_h1h2 = new ArrayList<Integer>();
 			// TODO
-
+			for (int i = 0; i < corpus.size(); i++) {
+				if (corpus.get(i) == h1 && corpus.get(i + 1) == h2) {
+					if (corpus.get(i + 2) == w) {
+						count++;
+					}
+					words_after_h1h2.add(corpus.get(i + 2));
+				}
+			}
 			// output
 			System.out.println(count);
 			System.out.println(words_after_h1h2.size());
@@ -212,24 +232,7 @@ class Segment {
 	}
 
 	public Segment(int word) {
-		if (type == 1) {
-			this.index = new int[1];
-			this.index[0] = index[0];
-
-		} else if (type == 2) {
-			this.index = new int[2];
-			this.index[0] = index[0];
-			this.index[1] = index[1];
-		} else {
-			this.index = new int[3];
-			this.index[0] = index[0];
-			this.index[1] = index[1];
-			this.index[2] = index[2];
-		}
-		this.type = type;
-		/*
-		 * this.lhs = lhs; this.rhs = rhs;
-		 */
+		this.word = word;
 
 	}
 
@@ -241,8 +244,8 @@ class Segment {
 		return rhs;
 	}
 
-	public int[] wordIndex() {
-		return index;
+	public int getWord() {
+		return word;
 	}
 
 	public void addCount() {
