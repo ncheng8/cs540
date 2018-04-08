@@ -216,7 +216,7 @@ public class Chatbot {
 				r = rng.nextDouble();
 				h2 = getBigram(allIntervals, corpus, r, h1);
 				System.out.println(h2);
-				//return;
+				// return;
 			} else if (t == 1) {
 				h1 = Integer.valueOf(args[3]);
 				// Generate second word using r
