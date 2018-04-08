@@ -64,15 +64,7 @@ public class Chatbot {
 				currPos += s.getCount() / (double) corpus.size();
 				s.setRHS(currPos);
 			}
-			// search through the segment list and find the "randomly chosen" word
-			/*for (Segment s : allIntervals) {
-				if (r <= s.getRHS() && r > s.getLHS()) {
-					System.out.println(s.getWord());
-					System.out.println(String.format("%.7f", s.getLHS()));
-					System.out.println(String.format("%.7f", s.getRHS()));
-				}
-			}*/
-			// try binary search
+			// search through the segment list with binary search for the chosen word
 			int index = binarySearch(allIntervals, r);
 			Segment s = allIntervals.get(index);
 			System.out.println(s.getWord());
@@ -83,7 +75,6 @@ public class Chatbot {
 			int w = Integer.valueOf(args[2]);
 			int count = 0;
 			ArrayList<Integer> words_after_h = new ArrayList<Integer>();
-			// TODO
 			for (int i = 0; i < corpus.size() - 1; i++) {
 				if (corpus.get(i) == h) {
 					if (corpus.get(i + 1) == w) {
@@ -102,7 +93,6 @@ public class Chatbot {
 			int h = Integer.valueOf(args[3]);
 			double r = n1 * 1.0 / n2;
 			double currPos = 0;
-			// TODO
 			// list of all segments; 4700, one for each word
 			ArrayList<Segment> allIntervals = new ArrayList<Segment>();
 			// instantiate all the segments, put a word in each one
@@ -125,7 +115,8 @@ public class Chatbot {
 				currPos += s.getCount() / (double) Segment.getFullCount();
 				s.setRHS(currPos);
 			}
-			// search through the segment list and find the "randomly chosen" word combination
+			// search through the segment list and find the "randomly chosen" word
+			// combination
 			int index = binarySearch(allIntervals, r);
 			Segment s = allIntervals.get(index);
 			System.out.println(s.getWord());
@@ -138,7 +129,6 @@ public class Chatbot {
 			int w = Integer.valueOf(args[3]);
 			int count = 0;
 			ArrayList<Integer> words_after_h1h2 = new ArrayList<Integer>();
-			// TODO
 			for (int i = 0; i < corpus.size() - 2; i++) {
 				if (corpus.get(i) == h1 && corpus.get(i + 1) == h2) {
 					if (corpus.get(i + 2) == w) {
@@ -159,7 +149,6 @@ public class Chatbot {
 			int n2 = Integer.valueOf(args[2]);
 			int h1 = Integer.valueOf(args[3]);
 			int h2 = Integer.valueOf(args[4]);
-			// TODO
 			double r = n1 * 1.0 / n2;
 			double currPos = 0;
 			// list of all segments; 4700, one for each word
@@ -172,7 +161,7 @@ public class Chatbot {
 			// go through corpus and update the word counts as we go
 			// also update total count of h combinations for calculations
 			for (int i = 0; i < corpus.size() - 1; i++) {
-				if (corpus.get(i) == h1 && corpus.get(i+1) == h2) {
+				if (corpus.get(i) == h1 && corpus.get(i + 1) == h2) {
 					allIntervals.get(corpus.get(i + 2)).addCount();
 					Segment.addFullCount();
 				}
@@ -189,8 +178,9 @@ public class Chatbot {
 				currPos += s.getCount() / (double) Segment.getFullCount();
 				s.setRHS(currPos);
 			}
-			
-			// search through the segment list and find the "randomly chosen" word combination
+
+			// search through the segment list and find the "randomly chosen" word
+			// combination
 			int index = binarySearch(allIntervals, r);
 			Segment s = allIntervals.get(index);
 			System.out.println(s.getWord());
@@ -213,39 +203,25 @@ public class Chatbot {
 				rng.setSeed(seed);
 
 			if (t == 0) {
-				// TODO Generate first word using r
+				// Generate first word using r
 				double r = rng.nextDouble();
-				/*double currPos = 0;
-				
-				// go through corpus and update the word counts as we go
-				for (Integer p : corpus)
-					allIntervals.get(p).addCount();
-				// calculate the l and r values for each segment based on their counts
-				// and the size of the corpus
-				for (Segment s : allIntervals) {
-					s.setLHS(currPos);
-					currPos += s.getCount() / (double) corpus.size();
-					s.setRHS(currPos);
-				}
-				// try binary search
-				int index = binarySearch(allIntervals, r);
-				Segment s = allIntervals.get(index);*/
 				h1 = getUnigram(allIntervals, corpus, r);
 				System.out.println(h1);
-				
+
 				if (h1 == 9 || h1 == 10 || h1 == 12) {
 					return;
 				}
-				
 
-				// TODO Generate second word using r
+				// Generate second word using r
 				r = rng.nextDouble();
+				h2 = getBigram(allIntervals, corpus, r, h1);
 				System.out.println(h2);
-				return;
+				//return;
 			} else if (t == 1) {
 				h1 = Integer.valueOf(args[3]);
-				// TODO Generate second word using r
+				// Generate second word using r
 				double r = rng.nextDouble();
+				h2 = getBigram(allIntervals, corpus, r, h1);
 				System.out.println(h2);
 			} else if (t == 2) {
 				h1 = Integer.valueOf(args[3]);
@@ -255,7 +231,8 @@ public class Chatbot {
 			while (h2 != 9 && h2 != 10 && h2 != 12) {
 				double r = rng.nextDouble();
 				int w = 0;
-				// TODO Generate new word using h1,h2
+				// Generate new words using h1,h2
+				w = getTrigram(allIntervals, corpus, r, h1, h2);
 				System.out.println(w);
 				h1 = h2;
 				h2 = w;
@@ -266,7 +243,8 @@ public class Chatbot {
 	}
 
 	public static int binarySearch(ArrayList<Segment> list, double x) {
-		// out of bounds check; this happens because no deletion of 0 probabilities occurs
+		// out of bounds check; this happens because no deletion of 0 probabilities
+		// occurs
 		// since I use the positions of the words in the array to index into them
 		if (x == 0) {
 			int i = 0;
@@ -275,7 +253,7 @@ public class Chatbot {
 					return i;
 				i++;
 			}
-		}			
+		}
 		if (x < 0 || x >= list.size()) {
 			return -1;
 		}
@@ -294,9 +272,13 @@ public class Chatbot {
 		}
 		return -1;
 	}
-	
+
 	public static int getUnigram(ArrayList<Segment> list, ArrayList<Integer> corpus, double r) {
-		double currPos = 0;		
+		// reset all counts for fresh list
+		for (Segment s : list) {
+			s.resetCount();
+		}
+		double currPos = 0;
 		// go through corpus and update the word counts as we go
 		for (Integer p : corpus)
 			list.get(p).addCount();
@@ -311,37 +293,75 @@ public class Chatbot {
 		Segment s = list.get(index);
 		return s.getWord();
 	}
+
+	public static int getBigram(ArrayList<Segment> list, ArrayList<Integer> corpus, double r, int h) {
+		// reset all count values to populate them again
+		for (Segment s : list) {
+			s.resetCount();
+		}
+		Segment.resetFullCount();
+		double currPos = 0;
+		// go through corpus and update the word counts as we go
+		// also update total count of h combinations for calculations
+		for (int i = 0; i < corpus.size() - 1; i++) {
+			if (corpus.get(i) == h) {
+				list.get(corpus.get(i + 1)).addCount();
+				Segment.addFullCount();
+			}
+		}
+		// calculate the l and r values for each segment based on their counts
+		// and the total number of h-combinations found
+		for (Segment s : list) {
+			s.setLHS(currPos);
+			currPos += s.getCount() / (double) Segment.getFullCount();
+			s.setRHS(currPos);
+		}
+		// search through the segment list and find the "randomly chosen" word
+		// combination
+		int index = binarySearch(list, r);
+		Segment s = list.get(index);
+		return s.getWord();
+	}
+
+	public static int getTrigram(ArrayList<Segment> list, ArrayList<Integer> corpus, double r, int h1, int h2) {
+		// reset all count values to populate them again
+		for (Segment s : list) {
+			s.resetCount();
+		}
+		Segment.resetFullCount();
+		double currPos = 0;
+		for (int i = 0; i < corpus.size() - 1; i++) {
+			if (corpus.get(i) == h1 && corpus.get(i + 1) == h2) {
+				list.get(corpus.get(i + 2)).addCount();
+				Segment.addFullCount();
+			}
+		}
+		// if h1 h2 pattern not found, just return undefined
+		if (Segment.getFullCount() == 0) {
+			return getBigram(list, corpus, r, h2);
+		}
+		// calculate the l and r values for each segment based on their counts
+		// and the total number of h-combinations found
+		for (Segment s : list) {
+			s.setLHS(currPos);
+			currPos += s.getCount() / (double) Segment.getFullCount();
+			s.setRHS(currPos);
+		}
+
+		// search through the segment list and find the "randomly chosen" word
+		// combination
+		int index = binarySearch(list, r);
+		Segment s = list.get(index);
+		return s.getWord();
+	}
 }
 
 class Segment {
-	private int type;
-	private int[] index;
 	private int word;
 	private int count = 0;
 	private static int fullCount = 0;
 	private double lhs;
 	private double rhs;
-
-	public Segment(int type, int[] index, double lhs, double rhs) {
-		if (type == 1) {
-			this.index = new int[1];
-			this.index[0] = index[0];
-
-		} else if (type == 2) {
-			this.index = new int[2];
-			this.index[0] = index[0];
-			this.index[1] = index[1];
-		} else {
-			this.index = new int[3];
-			this.index[0] = index[0];
-			this.index[1] = index[1];
-			this.index[2] = index[2];
-		}
-		this.type = type;
-		this.lhs = lhs;
-		this.rhs = rhs;
-
-	}
 
 	public Segment(int word) {
 		this.word = word;
@@ -364,8 +384,16 @@ class Segment {
 		this.count++;
 	}
 
+	public void resetCount() {
+		this.count = 0;
+	}
+
 	public static void addFullCount() {
 		fullCount++;
+	}
+
+	public static void resetFullCount() {
+		fullCount = 0;
 	}
 
 	public void setLHS(double x) {
