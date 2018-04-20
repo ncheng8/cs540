@@ -6,7 +6,7 @@ public class KillerFrost {
 
 	private static String filename = "./data.txt";
 
-	private static HashMap readIce() {
+	private static HashMap<Integer,Integer> readIce() {
 		//ArrayList<Integer> corpus = new ArrayList<Integer>();
 		HashMap<Integer,Integer> ice = new HashMap<Integer,Integer>();
 		try {
