@@ -56,6 +56,31 @@ public class Ice {
 		return MSE;
 	}
 	
+	private static double getMSENormalize(HashMap<Integer,Integer> ice, int n, double b0, double b1) {
+		double MSE = 0;
+		
+		double xMean = 0;
+		double SD = 0;
+		// calculate xMean for normalizing
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			xMean += (double) e.getKey();
+		}
+		xMean = xMean / (double) n;
+		// calculate Standard Deviation of x for normalizing
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {			
+			SD += Math.pow(e.getKey() - xMean,2);
+		}
+		SD = SD / (n-1);
+		SD = Math.sqrt(SD);
+		
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			double newX = ((double) e.getKey() - xMean) / SD;
+			MSE += Math.pow(b0 + (b1 * newX) - (double)e.getValue(), 2);
+		}
+		MSE = MSE / n;
+		return MSE;
+	}
+	
 	private static double[] getMSEGradient(HashMap<Integer,Integer> ice, int n, double b0, double b1) {
 		double MSE0 = 0;
 		double MSE1 = 0;
@@ -66,6 +91,40 @@ public class Ice {
 		MSE0 = MSE0 / (double) n;
 		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
 			MSE1 += (b0 + (b1 * (double)e.getKey()) - (double)e.getValue()) * (double) e.getKey();
+		}
+		MSE1 *= 2.0;
+		MSE1 = MSE1 / (double) n;
+		double[] gradient = {MSE0, MSE1};
+		return gradient;
+	}
+	
+	private static double[] getMSEGradientNormalize(HashMap<Integer,Integer> ice, int n, double b0, double b1) {
+		double MSE0 = 0;
+		double MSE1 = 0;
+		
+		double xMean = 0;
+		double SD = 0;
+		// calculate xMean for normalizing
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			xMean += (double) e.getKey();
+		}
+		xMean = xMean / (double) n;
+		// calculate Standard Deviation of x for normalizing
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			SD += Math.pow(e.getKey() - xMean,2);
+		}
+		SD = SD / (n-1);
+		SD = Math.sqrt(SD);
+		
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			double newX = ((double) e.getKey() - xMean) / SD;
+			MSE0 += b0 + (b1 * newX) - (double)e.getValue();
+		}
+		MSE0 *= 2.0;
+		MSE0 = MSE0 / (double) n;
+		for (Map.Entry<Integer,Integer> e : ice.entrySet()) {
+			double newX = ((double) e.getKey() - xMean) / SD;
+			MSE1 += (b0 + (b1 * newX) - (double)e.getValue()) * newX;
 		}
 		MSE1 *= 2.0;
 		MSE1 = MSE1 / (double) n;
@@ -161,6 +220,22 @@ public class Ice {
 			System.out.println(String.format("%.2f", direct[2]));
 		} else if (flag == 700) {
 			double year = Double.valueOf(args[1]);
+			double[] direct = getDirectMSE(ice,n);
+			System.out.println(String.format("%.2f", direct[0] + (direct[1] * year)));
+		} else if (flag == 800) {
+			double step = Double.valueOf(args[1]);
+			int t = Integer.valueOf(args[2]);
+			double b0 = 0;
+			double b1 = 0;
+			for (int i = 1; i <= t; i++) {
+				double[] gradient = getMSEGradientNormalize(ice, n, b0, b1);
+				b0 = b0 - (step * gradient[0]);
+				b1 = b1 - (step * gradient[1]);
+				System.out.print(i + " ");
+				System.out.print(String.format("%.2f", b0) + " ");
+				System.out.print(String.format("%.2f", b1) + " ");
+				System.out.println(String.format("%.2f", getMSENormalize(ice, n, b0, b1)));
+			}
 		}
 
 	}
