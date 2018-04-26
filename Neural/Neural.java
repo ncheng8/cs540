@@ -1,6 +1,10 @@
 import java.util.*;
 public class Neural {
-
+	public static double getPartial(double vJ, double y) {
+		double dEvJ = vJ - y;
+		double dEuC = dEvJ * vJ * (1-vJ);
+		return dEuC;
+	}
 	public static void main(String[] args) {
 		if (args.length < 1) {
 			System.out.println("Please enter arguments");
@@ -41,7 +45,7 @@ public class Neural {
 			System.out.print(String.format("%.5f", dEuC) + " ");
 		} else if (flag == 300) {
 			double y = Double.valueOf(args[12]);
-			double E = 0.5 * Math.pow(vC - y, 2);
+			//double E = 0.5 * Math.pow(vC - y, 2);
 			double dEvC = vC - y;
 			double dEuC = dEvC * vC * (1-vC);
 			
@@ -60,6 +64,38 @@ public class Neural {
 			System.out.print(String.format("%.5f", dEuA) + " ");
 			System.out.print(String.format("%.5f", dEvB) + " ");
 			System.out.print(String.format("%.5f", dEuB) + " ");
+		} else if (flag == 400) {
+			double y = Double.valueOf(args[12]);
+			double[] pwd = new double[10];
+			
+			double dEvC = vC - y;
+			double dEuC = dEvC * vC * (1-vC);
+			
+			double dEvA = w[8] * dEuC;
+			double dEvB = w[9] * dEuC;
+			
+			double dEuA = 0;
+			double dEuB = 0;
+			
+			if (uA >= 0) 
+				dEuA = dEvA;
+			if (uB >= 0) 
+				dEuB = dEvB;
+			
+			pwd[1] = dEuA;
+			pwd[2] = dEuA * x1;
+			pwd[3] = dEuA * x2;
+			pwd[4] = dEuB;
+			pwd[5] = dEuB * x1;
+			pwd[6] = dEuB * x2;
+			pwd[7] = dEuC;
+			pwd[8] = dEuC * vA;
+			pwd[9] = dEuC * vB;
+			
+			for (int i = 1; i < 10; i++) {
+				System.out.print(String.format("%.5f", pwd[i]) + " ");
+			}
+			
 		}
 
 	}
