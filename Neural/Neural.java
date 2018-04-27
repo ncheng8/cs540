@@ -54,7 +54,7 @@ public class Neural {
 		return students;
 	}
 
-	public static double[] getEpoch(double[] wP, double x1, double x2, int y, double n) {
+	public static double[] getEpoch(double[] wP, double x1, double x2, int y, double n, List<Student> eval) {
 		double[] w = wP;
 
 		double uA = w[1] + (x1 * w[2]) + (x2 * w[3]);
@@ -94,7 +94,7 @@ public class Neural {
 		for (int i = 1; i < 10; i++) {
 			w[i] = w[i] - (n * pwd[i]);
 		}
-		double eN = getSetError(w, getEval());
+		double eN = getSetError(w, eval);
 
 		w[0] = eN;
 		return w;
@@ -265,13 +265,13 @@ public class Neural {
 		} else if (flag == 600) {
 			double n = Double.valueOf(args[10]);
 			List<Student> students = getStudents();
-			// List<Student> eval = getEval();
+			List<Student> eval = getEval();
 			double[] response;
 			for (Student s : students) {
 				System.out.print(String.format("%.5f", s.getx1()) + " ");
 				System.out.print(String.format("%.5f", s.getx2()) + " ");
 				System.out.print(String.format("%.5f", (double) s.getY()) + "\n");
-				response = getEpoch(w, s.getx1(), s.getx2(), s.getY(), n);
+				response = getEpoch(w, s.getx1(), s.getx2(), s.getY(), n,eval);
 				for (int i = 1; i < 10; i++) {
 					System.out.print(String.format("%.5f", response[i]) + " ");
 				}
@@ -282,16 +282,39 @@ public class Neural {
 			double n = Double.valueOf(args[10]);
 			int T = Integer.valueOf(args[11]);
 			List<Student> students = getStudents();
+			List<Student> eval = getEval();
 			double[] response = {0};
 			for (int j = 0; j < T; j++) {
 				for (Student s : students) {
-					response = getEpoch(w, s.getx1(), s.getx2(), s.getY(), n);
+					response = getEpoch(w, s.getx1(), s.getx2(), s.getY(), n,eval);
 				}
 				for (int i = 1; i < 10; i++) {
 					System.out.print(String.format("%.5f", response[i]) + " ");
 				}
 				System.out.println("");
 				System.out.println(String.format("%.5f", response[0]));
+			}
+		} else if (flag == 800) {
+			double n = Double.valueOf(args[10]);
+			int T = Integer.valueOf(args[11]);
+			List<Student> students = getStudents();
+			List<Student> eval = getEval();
+			double[] response = {0};
+			double currError = 999999999;
+			for (int j = 0; j < T; j++) {
+				for (Student s : students) {
+					response = getEpoch(w, s.getx1(), s.getx2(), s.getY(), n,eval);
+				}
+				if (response[0] > currError) {
+					System.out.println(j + 1);
+					for (int i = 1; i < 10; i++) {
+						System.out.print(String.format("%.5f", response[i]) + " ");
+					}
+					System.out.println("");
+					System.out.println(String.format("%.5f", response[0]));
+					break;
+				}
+				currError = response[0];
 			}
 		}
 
